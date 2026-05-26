@@ -18,10 +18,11 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 
-# Копируем все файлы проекта в контейнер
+ARG NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+
 COPY . .
 
-#собираем билд
 RUN corepack enable pnpm && pnpm run build;
 
 # Production image, copy all the files and run next

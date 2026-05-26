@@ -98,19 +98,19 @@ The following augmentations are applied during training:
 The model is a small Temporal Convolutional Network. It uses dilated 1D convolutions and residual blocks
 
 ```text
-Stem:    Conv1d(2 -> 48, kernel_size=7)
-Block1:  ResidualBlock(48 -> 48,  kernel_size=7, dilation=1)
-Block2:  ResidualBlock(48 -> 96,  kernel_size=7, dilation=2)
+Stem:    Conv1d(2 -> 64, kernel_size=7)
+Block1:  ResidualBlock(64 -> 64,  kernel_size=7, dilation=1)
+Block2:  ResidualBlock(64 -> 128, kernel_size=7, dilation=2)
 Pool2:   AvgPool1d(2)
-Block3:  ResidualBlock(96 -> 96,  kernel_size=7, dilation=4)
-Block4:  ResidualBlock(96 -> 192, kernel_size=7, dilation=8)
+Block3:  ResidualBlock(128 -> 128, kernel_size=7, dilation=4)
+Block4:  ResidualBlock(128 -> 256, kernel_size=7, dilation=8)
 Pool4:   AdaptiveAvgPool1d(1)
-Head:    Linear(192 -> 96) -> ReLU -> Dropout(0.2) -> Linear(96 -> 1)
+Head:    Linear(256 -> 128) -> ReLU -> Dropout(0.1) -> Linear(128 -> 1)
 ```
 
 The model outputs one logit. During inference, a sigmoid is applied to convert it into a hypoxia probability in the range `[0, 1]`.
 
-The model uses `base=48`, which matches the `best_fold0.pt` checkpoint used by the inference code.
+The shipped `best_fold0.pt` checkpoint uses `base=64` and `p_drop=0.1` (same as `hypoxia_predictor.MODEL_BASE`). Training defaults use `--base 48` for smaller experiments; use `--base 64` to reproduce the production weights.
 
 ## Training setup
 

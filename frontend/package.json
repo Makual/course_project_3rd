@@ -43,6 +43,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
     "@biomejs/biome": "1.9.4",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

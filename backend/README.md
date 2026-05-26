@@ -37,7 +37,8 @@ It can emulate real-time monitoring:
 ├── Dockerfile            # Docker image definition
 ├── report_generator.py   # CTG report generation utility
 ├── hypoxia_predictor.py  # PyTorch model initialization and inference helper
-├── best_fold0.pt         # TinyTCN checkpoint
+├── best_fold0.pt         # TinyTCN checkpoint (base=64)
+├── example/              # Sample CSV files for testing
 ├── docker-compose.yml    # Docker Compose configuration
 └── README.md             # Project documentation
 ```
@@ -48,7 +49,7 @@ It can emulate real-time monitoring:
 
 ```bash
 git clone https://github.com/Makual/course_project_3rd.git
-cd ctg-monitor
+cd course_project_3rd/backend
 ```
 
 ### 2. Run with Docker Compose
@@ -136,8 +137,8 @@ curl -N http://localhost:8000/api/stream/a1b2c3d4-...
 
 ```bash
 curl -X POST "http://localhost:8000/api/instant" \
-  -F "fhr_file=@fhr.csv" \
-  -F "uterus_file=@uterus.csv"
+  -F "fhr_file=@example/full_bpm.csv" \
+  -F "uterus_file=@example/full_uterus.csv"
 ```
 
 ## CSV format

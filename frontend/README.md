@@ -1,10 +1,17 @@
 ## Getting Started
 
-Instruction:
-- add to .env: NEXT_PUBLIC_BACKEND_URL=<server_url>
-- execute:
-```bash
-docker compose up -d
-```
-- Go to http://0.0.0.0:3000
+1. Create `.env` in this directory:
 
+```env
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+```
+
+2. Build and run:
+
+```bash
+docker compose up --build -d
+```
+
+3. Open the app at [http://localhost:3000](http://localhost:3000)
+
+The backend API must be running separately (see `../backend/README.md`).

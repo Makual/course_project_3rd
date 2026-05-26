@@ -1563,7 +1563,7 @@ async def instant(
 
 if __name__ == "__main__":
     uvicorn.run(
-        "api_server_optimized:app",
+        "api_server:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", "8000")),
         reload=False,
