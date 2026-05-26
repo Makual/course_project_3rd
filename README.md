@@ -1,99 +1,118 @@
-# КТГ Мониторинг API
+# CTG Monitoring API
 
-Эмуляция работы монитора для анализа кардиотокограммы (ЧСС плода и активности матки).  
-Сервис реализован на **FastAPI** и поддерживает потоковую передачу моментов и периодические аннотации.  
+A FastAPI service that simulates a CTG monitor for fetal heart rate and uterine activity analysis. It supports streaming data points and periodic annotations, which makes it useful for demos, testing, and integration with a frontend client.
 
-## Содержание
+## Contents
 
-- [Описание](#описание)  
-- [Структура проекта](#структура-проекта)  
-- [Установка и запуск](#установка-и-запуск)  
-- [API эндпоинты](#api-эндпоинты)  
-- [Примеры запросов](#примеры-запросов)  
+- [Overview](#overview)
+- [Project structure](#project-structure)
+- [Setup and run](#setup-and-run)
+- [API endpoints](#api-endpoints)
+- [Request examples](#request-examples)
+- [CSV format](#csv-format)
 
----
+## Overview
 
-## Описание
+The service accepts CSV files with two CTG channels:
 
-- Загружает CSV с сигналами **ЧСС плода (fhr)** и **активности матки (uterus)**  
-- Эмулирует реальное время:  
-  - *моменты (moments_batch)* идут каждые `interval_sec` секунд  
-  - *аннотации* приходят строго каждые 30 секунд **модельного времени**  
-- Поддержка SSE (Server-Sent Events) для подписки на поток  
+- fetal heart rate (`fhr`)
+- uterine activity (`uterus`)
 
----
+It can emulate real-time monitoring:
 
-## Структура проекта
+- data points are sent in `moments_batch` events every `interval_sec` seconds
+- annotations are produced every 30 seconds of simulated time
+- clients can subscribe to the stream using Server-Sent Events (SSE)
 
-```
+## Project structure
+
+```text
 .
-├── api_server.py       # FastAPI приложение
-├── processing.py       # Логика обработки сигналов (алгоритмы)
-├── requirements.txt    # Зависимости Python
-├── Dockerfile          # Docker-образ
-├── report_generator.py # Утилита для создания отчёта после ктг
-├── hypoxia_predictor.py # Утилита для инициализирования pytorch модели предсказания острой гипоксии
-├── best_fold0.pt       # Веса TinyTCN (base=64, обучение exp3)
-├── docker-compose.yml  # Оркестрация
-└── README.md           # Документация
+├── api_server.py         # FastAPI application
+├── processing.py         # Signal processing logic and rule-based algorithms
+├── requirements.txt      # Python dependencies
+├── training/             # Model training code and documentation
+├── Dockerfile            # Docker image definition
+├── report_generator.py   # CTG report generation utility
+├── hypoxia_predictor.py  # PyTorch model initialization and inference helper
+├── best_fold0.pt         # TinyTCN checkpoint
+├── docker-compose.yml    # Docker Compose configuration
+└── README.md             # Project documentation
 ```
 
----
+## Setup and run
 
-## Установка и запуск
+### 1. Clone the repository
 
-### 1. Склонировать репозиторий
 ```bash
 git clone https://github.com/your-org/ctg-monitor.git
 cd ctg-monitor
 ```
 
-### 2. Запуск через Docker Compose
+### 2. Run with Docker Compose
+
 ```bash
 docker compose up --build -d
 ```
 
-### 3. Проверка работы
-API будет доступно по адресу:  
-[http://localhost:8000](http://localhost:8000)  
-Документация Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)  
+### 3. Check that the service is running
 
----
+The API should be available at:
 
-## API эндпоинты
+```text
+http://localhost:8000
+```
+
+Swagger documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+## API endpoints
 
 ### `GET /`
-Информация о сервисе и доступных эндпоинтах.
+
+Returns basic service information and a list of available endpoints.
 
 ### `POST /api/upload`
-Загрузка двух CSV (`fhr_file`, `uterus_file`) и запуск эмуляции.  
-Возвращает `monitor_id` и ссылку для подключения к стриму.
+
+Uploads two CSV files, `fhr_file` and `uterus_file`, and starts a monitoring session.
+
+The response contains a `monitor_id` and a stream URL.
 
 ### `GET /api/stream/{monitor_id}`
-Подключение к потоку **мгновенных моментов и аннотаций** (формат SSE).  
+
+Subscribes to the monitoring stream for a specific monitor.
+
+The stream uses SSE and sends data points together with periodic annotations.
 
 ### `GET /api/monitors`
-Список активных и завершённых мониторов.  
+
+Returns active and finished monitor sessions.
 
 ### `POST /api/instant`
-Мгновенная обработка данных без стрима.  
-Возвращает полный список `moments` и одну полную `annotation`.  
+
+Processes the uploaded data immediately without starting a stream.
+
+The response contains the full list of `moments` and one complete `annotation`.
 
 ### `POST /api/monitors/{monitor_id}/report`
-Возвращает отчет по КТГ после завершения
 
----
+Returns a CTG report for a finished monitoring session.
 
-## Примеры запросов
+## Request examples
 
-### Загрузка данных и запуск стрима
+### Upload data and start streaming
+
 ```bash
 curl -X POST "http://localhost:8000/api/upload" \
   -F "fhr_file=@fhr.csv" \
   -F "uterus_file=@uterus.csv"
 ```
 
-Ответ:
+Example response:
+
 ```json
 {
   "monitor_id": "a1b2c3d4-...",
@@ -105,25 +124,26 @@ curl -X POST "http://localhost:8000/api/upload" \
 }
 ```
 
-### Подключение к стриму
+### Connect to the stream
+
 ```bash
 curl -N http://localhost:8000/api/stream/a1b2c3d4-...
 ```
 
-### Мгновенная обработка
+### Run instant processing
+
 ```bash
 curl -X POST "http://localhost:8000/api/instant" \
   -F "fhr_file=@fhr.csv" \
   -F "uterus_file=@uterus.csv"
 ```
 
----
+## CSV format
 
-## Формат CSV
+The input CSV can use one of the following formats.
 
-CSV должен содержать один из вариантов:  
+### Single-column CSV
 
-1. Один столбец:
 ```csv
 value
 123
@@ -131,7 +151,8 @@ value
 122
 ```
 
-2. Два столбца:
+### Two-column CSV
+
 ```csv
 time_sec,value
 0.0,123
