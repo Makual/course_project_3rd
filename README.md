@@ -1,3 +1,5 @@
+The project was developed as a prototype of a CTG monitoring system. It combines signal processing, real-time stream emulation, report generation, and a neural network model for fetal hypoxia risk prediction.
+
 # CTG Monitoring API
 
 A FastAPI service that simulates a CTG monitor for fetal heart rate and uterine activity analysis. It supports streaming data points and periodic annotations, which makes it useful for demos, testing, and integration with a frontend client.
@@ -45,7 +47,7 @@ It can emulate real-time monitoring:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-org/ctg-monitor.git
+git clone https://github.com/Makual/course_project_3rd.git
 cd ctg-monitor
 ```
 
