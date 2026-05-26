@@ -1,0 +1,16 @@
+networks:
+  humarin-network:
+    name: humarin-network
+    external: true
+
+services:
+  humarin-app:
+    container_name: humarin-app
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+    command: node server.js # Команда для запуска приложения
+    networks:
+      - humarin-network
