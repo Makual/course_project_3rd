@@ -1,7 +1,7 @@
 ## Getting Started
 
 Instruction:
-- add to .env: NEXT_PUBLIC_BACKEND_URL=<url_сервера>
+- add to .env: NEXT_PUBLIC_BACKEND_URL=<server_url>
 - execute:
 ```bash
 docker compose up -d
